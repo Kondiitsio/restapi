@@ -1,5 +1,3 @@
-import os
-import requests
 from flask import current_app
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
@@ -13,10 +11,7 @@ from models import UserModel
 from schemas import UserSchema, UserRegisterSchema
 from tasks import send_user_registration_email
 
-
 blp = Blueprint("Users", "users", description="Operations on users")
-
-
 
 @blp.route("/register")
 class UserRegister(MethodView):
@@ -73,13 +68,13 @@ class TokenRefresh(MethodView):
 class UserLogout(MethodView):
     @jwt_required()
     def post(self):
-        jti = get_jwt()["jti"]
-        BLOCKLIST.add(jti)
+        jwt = get_jwt()
+        if jwt:
+            jti = jwt["jti"]
+            BLOCKLIST.add(jti)
         return {"message": "Successfully logged out."}
 
 
-
-    
 @blp.route("/user/<int:user_id>")
 class User(MethodView):
     @blp.response(200, UserSchema)
